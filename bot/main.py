@@ -2,7 +2,8 @@ import discord
 import os
 
 client = discord.Client()
-keywords = ['good morning', 'good mornin', 'morning', 'mornin']
+partial_keywords = ['good morning', 'good mornin']
+whole_keywors = ['morning', 'mornin']
 
 
 @client.event
@@ -15,7 +16,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if any(keyword == message.content.lower() for keyword in keywords):
+    if any(keyword == message.content.lower() for keyword in whole_keywors) or any(keyword in message.content.lower() for keyword in partial_keywords):
         await message.add_reaction(r"☕")
 
 
