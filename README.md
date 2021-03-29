@@ -1,2 +1,2 @@
 # MorningCoffeeBot
-A bot that reacts with ☕️ to "Good morning"
+A bot that reacts with ☕️ to "Good morning".
