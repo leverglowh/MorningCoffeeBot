@@ -15,7 +15,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if (' ' not in message.content and 'mornin' in message.content) or any(keyword in message.content.lower() for keyword in partial_keywords):
+    if (' ' not in message.content and 'mornin' in message.content.lower()) or any(keyword in message.content.lower() for keyword in partial_keywords):
         await message.add_reaction(r"☕")
 
 
