@@ -33,6 +33,7 @@ async def on_message(message):
 
     if ('easter' in newMessage.lower()):
         await message.add_reaction(r"🐰")
+        await message.add_reaction(r"🥚")
 
 @client.event
 async def on_message_edit(before, after):
