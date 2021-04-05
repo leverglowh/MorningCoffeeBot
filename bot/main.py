@@ -31,9 +31,10 @@ async def on_message(message):
     if (' ' not in newMessage and 'mornin' in newMessage.lower()) or any(keyword in newMessage.lower() for keyword in partial_keywords):
         await message.add_reaction(r"☕")
 
-    if ('easter' in newMessage.lower()):
-        await message.add_reaction(r"🐰")
-        await message.add_reaction(r"🥚")
+# Easter
+    # if ('easter' in newMessage.lower()):
+    #     await message.add_reaction(r"🐰")
+    #     await message.add_reaction(r"🥚")
 
 @client.event
 async def on_message_edit(before, after):
