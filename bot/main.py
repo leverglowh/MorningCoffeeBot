@@ -4,7 +4,7 @@ import re
 import os
 
 client = discord.Client()
-partial_keywords = ['good morning', 'good mornin']
+partial_keywords = ['good morning', 'good mornin', 'goood morning']
 
 def deEmojify(text):
     regrex_pattern = re.compile(pattern = "["
