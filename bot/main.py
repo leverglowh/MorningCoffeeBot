@@ -37,8 +37,12 @@ async def on_message(message):
     #     await message.add_reaction(r"🥚")
     
     # Christmas
-    if (any(w in newMessage.lower() for w in ['christmas', 'xmas'])):
-        await message.add_reaction(r"🎄")
+    # if (any(w in newMessage.lower() for w in ['christmas', 'xmas'])):
+    #    await message.add_reaction(r"🎄")
+    
+    # New Year
+    if ('happy new year' in newMessage.lower()):
+        await message.add_reaction(r"🎉")
 
 @client.event
 async def on_message_edit(before, after):
