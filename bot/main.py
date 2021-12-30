@@ -27,6 +27,10 @@ async def on_message(message):
         return
     # Ignore all emojis
     newMessage = deEmojify(message.content).translate(str.maketrans('', '', string.punctuation)).strip()
+    
+    # Server count command
+    if message.content.startswith('-serverCount'):
+        await message.channel.send("I'm in " + str(len(client.guilds)) + " servers!")
 
     if (' ' not in newMessage and 'mornin' in newMessage.lower()) or any(keyword in newMessage.lower() for keyword in partial_keywords):
         await message.add_reaction(r"☕")
