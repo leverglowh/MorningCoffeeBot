@@ -1,5 +1,6 @@
 import discord
 import string
+import requests
 import re
 import os
 
@@ -27,10 +28,21 @@ async def on_message(message):
         return
     # Ignore all emojis
     newMessage = deEmojify(message.content).translate(str.maketrans('', '', string.punctuation)).strip()
-    
+
     # Server count command
     if message.content.lower().startswith('-servercount'):
         await message.channel.send("I'm in " + str(len(client.guilds)) + " servers!")
+        jsonbin = os.getenv('JSONBIN_BIN_ID')
+        api_key = os.getenv('JSONBIN_API_KEY')
+        url = 'https://api.jsonbin.io/v3/b/' + jsonbin;
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Master-Key': api_key
+        }
+        data = {"serverCount": str(len(client.guilds))}
+
+        req = requests.put(url, json=data, headers=headers)
+        print(req.text)
 
     if (' ' not in newMessage and 'mornin' in newMessage.lower()) or any(keyword in newMessage.lower() for keyword in partial_keywords):
         await message.add_reaction(r"☕")
@@ -39,11 +51,11 @@ async def on_message(message):
     # if ('easter' in newMessage.lower()):
     #     await message.add_reaction(r"🐰")
     #     await message.add_reaction(r"🥚")
-    
+
     # Christmas
     # if (any(w in newMessage.lower() for w in ['christmas', 'xmas'])):
     #    await message.add_reaction(r"🎄")
-    
+
     # New Year
     # if ('happy new year' in newMessage.lower()):
     #    await message.add_reaction(r"🎉")
