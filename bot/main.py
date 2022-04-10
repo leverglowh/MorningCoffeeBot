@@ -48,9 +48,9 @@ async def on_message(message):
         await message.add_reaction(r"☕")
 
     # Easter
-    # if ('easter' in newMessage.lower()):
-    #     await message.add_reaction(r"🐰")
-    #     await message.add_reaction(r"🥚")
+    if ('easter' in newMessage.lower()):
+        await message.add_reaction(r"🐰")
+        await message.add_reaction(r"🥚")
 
     # Christmas
     # if (any(w in newMessage.lower() for w in ['christmas', 'xmas'])):
