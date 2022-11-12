@@ -7,17 +7,20 @@ import os
 import json
 
 def get_env_data_as_dict(path: str) -> dict:
-    with open(path, 'r') as f:
-        return dict(tuple(line.replace('\n', '').split('='))
-            for line in f.readlines() if not line.startswith('#'))
+    try:
+        with open(path, 'r') as f:
+            return dict(tuple(line.replace('\n', '').split('='))
+                for line in f.readlines() if not line.startswith('#'))
+    except OSError as e:
+        return {}
 
 envData = get_env_data_as_dict('.env')
 
 #---------------------
 
 def readBin(key: str) -> any:
-    jsonbin = os.getenv(key) or envData[key]
-    api_key = os.getenv('JSONBIN_API_KEY') or envData['JSONBIN_API_KEY']
+    jsonbin = os.getenv(key) or envData.get(key)
+    api_key = os.getenv('JSONBIN_API_KEY') or envData.get('JSONBIN_API_KEY')
     url = 'https://api.jsonbin.io/v3/b/' + jsonbin + '/latest';
     headers = {
         'X-Master-Key': api_key,
@@ -29,8 +32,8 @@ def readBin(key: str) -> any:
     return response
 
 def updateBin(key: str, data: dict) -> None:
-    jsonbin = os.getenv(key) or envData[key]
-    api_key = os.getenv('JSONBIN_API_KEY') or envData['JSONBIN_API_KEY']
+    jsonbin = os.getenv(key) or envData.get(key)
+    api_key = os.getenv('JSONBIN_API_KEY') or envData.get('JSONBIN_API_KEY')
     url = 'https://api.jsonbin.io/v3/b/' + jsonbin;
     headers = {
         'Content-Type': 'application/json',
@@ -136,4 +139,4 @@ async def on_message_edit(before, after):
         await after.add_reaction(r"☕")
 
 
-client.run(os.getenv('MORNING_COFFEE_BOT_TOKEN') or envData['MORNING_COFFEE_BOT_TOKEN'])
+client.run(os.getenv('MORNING_COFFEE_BOT_TOKEN') or envData.get('MORNING_COFFEE_BOT_TOKEN'))
