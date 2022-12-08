@@ -6,6 +6,8 @@ import re
 import os
 import json
 
+tempCountDict = {}
+
 def get_env_data_as_dict(path: str) -> dict:
     try:
         with open(path, 'r') as f:
@@ -20,36 +22,36 @@ envData = get_env_data_as_dict('.env')
 
 def readBin(key: str) -> any:
     jsonbin = os.getenv(key) or envData.get(key)
-    api_key = os.getenv('JSONBIN_API_KEY') or envData.get('JSONBIN_API_KEY')
-    url = 'https://api.jsonbin.io/v3/b/' + jsonbin + '/latest';
+    bin_security_key = os.getenv('JSONBIN_SECURITY_KEY') or envData.get('JSONBIN_SECURITY_KEY')
+    url = 'https://json.extendsclass.com/bin/' + jsonbin;
     headers = {
-        'X-Master-Key': api_key,
-        'X-Bin-Meta': 'false'
+        'Security-key': bin_security_key
     }
+    # print(url)
     req = requests.get(url, json=None, headers=headers)
     response = json.loads(req.text)
-    print(response)
+    # print(response)
     return response
 
 def updateBin(key: str, data: dict) -> None:
     jsonbin = os.getenv(key) or envData.get(key)
-    api_key = os.getenv('JSONBIN_API_KEY') or envData.get('JSONBIN_API_KEY')
-    url = 'https://api.jsonbin.io/v3/b/' + jsonbin;
+    bin_security_key = os.getenv('JSONBIN_SECURITY_KEY') or envData.get('JSONBIN_SECURITY_KEY')
+    url = 'https://json.extendsclass.com/bin/' + jsonbin;
     headers = {
-        'Content-Type': 'application/json',
-        'X-Master-Key': api_key
+        'Security-key': bin_security_key
     }
 
     req = requests.put(url, json=data, headers=headers)
-    print(req.text)
+    # print(req.text)
 
 def onAddEmoji(date: str) -> None:
-    countedDict = readBin('JSONBIN_REQUESTS_COUNT_BIN')
-    todaysCount = countedDict.get(date, 0)
+    global tempCountDict
+    # countedDict = readBin('JSONBIN_REQUESTS_COUNT_BIN')
+    todaysCount = tempCountDict.get(date, 0)
     todaysCount+=1
-    countedDict[date] = todaysCount
-    print(date, '', todaysCount)
-    updateBin('JSONBIN_REQUESTS_COUNT_BIN', countedDict)
+    tempCountDict[date] = todaysCount
+    # print(date, '', todaysCount)
+    # updateBin('JSONBIN_REQUESTS_COUNT_BIN', countedDict)
 
 def parseDates(year: int) -> dict:
     dates = {}
@@ -91,6 +93,8 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global tempCountDict
+
     today = datetime.now()
     todayJustDate = today.strftime("%Y%m%d")
     parsedDates = parseDates(today.year)
@@ -103,8 +107,18 @@ async def on_message(message):
     if message.content.lower().startswith('-servercount'):
         await message.channel.send("I'm in " + str(len(client.guilds)) + " servers!")
 
-        data = {"serverCount": str(len(client.guilds))}
-        updateBin('JSONBIN_BIN_ID', data)
+        oldBinDict = readBin('JSONBIN_BIN_ID')
+        # print(oldBinDict)
+
+        oldBinDict['serverCount'] = str(len(client.guilds))
+
+        for date in tempCountDict:
+            oldBinDict['usageCount'][date] = oldBinDict['usageCount'].get(date, 0) + tempCountDict[date]
+
+        # print(oldBinDict)
+        tempCountDict = {}
+
+        updateBin('JSONBIN_BIN_ID', oldBinDict)
         return
 
     if (' ' not in newMessage and 'mornin' in newMessage.lower()) or any(keyword in newMessage.lower() for keyword in partial_keywords):
