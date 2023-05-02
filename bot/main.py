@@ -49,13 +49,11 @@ def updateGist(data: dict) -> None:
 
 def onAddEmoji(date: str) -> None:
     gistRes = readGist()
-    print(gistRes)
     countedDict = gistRes['usageCount']
-    print(countedDict)
     todaysCount = countedDict.get(date, 0)
-    print(todaysCount)
     todaysCount+=1
     countedDict[date] = todaysCount
+    # print(todaysCount)
     gistRes['usageCount'] = countedDict
     updateGist(gistRes)
 
