@@ -20,38 +20,44 @@ envData = get_env_data_as_dict('.env')
 
 #---------------------
 
-def readBin(key: str) -> any:
-    jsonbin = os.getenv(key) or envData.get(key)
-    bin_security_key = os.getenv('JSONBIN_SECURITY_KEY') or envData.get('JSONBIN_SECURITY_KEY')
-    url = 'https://json.extendsclass.com/bin/' + jsonbin;
-    headers = {
-        'Security-key': bin_security_key
-    }
+def readGist() -> any:
+    gist_id = os.getenv('GH_GIST_ID') or envData.get('GH_GIST_ID')
+    url = 'https://api.github.com/gists/' + gist_id
     # print(url)
-    req = requests.get(url, json=None, headers=headers)
-    response = json.loads(req.text)
-    # print(response)
+    req = requests.get(url, json=None, headers=None)
+    response = json.loads(req.json().get('files').get('mcb.json').get('content'))
     return response
 
-def updateBin(key: str, data: dict) -> None:
-    jsonbin = os.getenv(key) or envData.get(key)
-    bin_security_key = os.getenv('JSONBIN_SECURITY_KEY') or envData.get('JSONBIN_SECURITY_KEY')
-    url = 'https://json.extendsclass.com/bin/' + jsonbin;
+def updateGist(data: dict) -> None:
+    gist_id = os.getenv('GH_GIST_ID') or envData.get('GH_GIST_ID')
+    gh_access_token = os.getenv('GH_ACCESS_TOKEN') or envData.get('GH_ACCESS_TOKEN')
+    url = 'https://api.github.com/gists/' + gist_id
     headers = {
-        'Security-key': bin_security_key
+        'Authorization': 'Bearer ' + gh_access_token
     }
+    body = {
+        "files": {
+            "mcb.json": {
+                "content": json.dumps(data)
+            }
+        }
+    }
+    req = requests.patch(url, json=body, headers=headers)
+    
 
-    req = requests.put(url, json=data, headers=headers)
     # print(req.text)
 
 def onAddEmoji(date: str) -> None:
-    global tempCountDict
-    # countedDict = readBin('JSONBIN_REQUESTS_COUNT_BIN')
-    todaysCount = tempCountDict.get(date, 0)
+    gistRes = readGist()
+    print(gistRes)
+    countedDict = gistRes['usageCount']
+    print(countedDict)
+    todaysCount = countedDict.get(date, 0)
+    print(todaysCount)
     todaysCount+=1
-    tempCountDict[date] = todaysCount
-    # print(date, '', todaysCount)
-    # updateBin('JSONBIN_REQUESTS_COUNT_BIN', countedDict)
+    countedDict[date] = todaysCount
+    gistRes['usageCount'] = countedDict
+    updateGist(gistRes)
 
 def parseDates(year: int) -> dict:
     dates = {}
@@ -93,8 +99,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global tempCountDict
-
     today = datetime.now()
     todayJustDate = today.strftime("%Y%m%d")
     parsedDates = parseDates(today.year)
@@ -107,18 +111,11 @@ async def on_message(message):
     if message.content.lower().startswith('-servercount'):
         await message.channel.send("I'm in " + str(len(client.guilds)) + " servers!")
 
-        oldBinDict = readBin('JSONBIN_BIN_ID')
-        # print(oldBinDict)
+        gistRes = readGist()
 
-        oldBinDict['serverCount'] = str(len(client.guilds))
+        gistRes['serverCount'] = str(len(client.guilds))
 
-        for date in tempCountDict:
-            oldBinDict['usageCount'][date] = oldBinDict['usageCount'].get(date, 0) + tempCountDict[date]
-
-        # print(oldBinDict)
-        tempCountDict = {}
-
-        updateBin('JSONBIN_BIN_ID', oldBinDict)
+        updateGist(gistRes)
         return
 
     if (' ' not in newMessage and 'mornin' in newMessage.lower()) or any(keyword in newMessage.lower() for keyword in partial_keywords):
