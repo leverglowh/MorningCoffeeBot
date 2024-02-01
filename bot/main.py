@@ -48,14 +48,14 @@ def updateGist(data: dict) -> None:
     # print(req.text)
 
 def onAddEmoji(date: str) -> None:
-    gistRes = readGist()
-    countedDict = gistRes['usageCount']
-    todaysCount = countedDict.get(date, 0)
-    todaysCount+=1
-    countedDict[date] = todaysCount
-    # print(todaysCount)
-    gistRes['usageCount'] = countedDict
-    updateGist(gistRes)
+    # gistRes = readGist()
+    # countedDict = gistRes['usageCount']
+    # todaysCount = countedDict.get(date, 0)
+    # todaysCount+=1
+    # countedDict[date] = todaysCount
+    # # print(todaysCount)
+    # gistRes['usageCount'] = countedDict
+    # updateGist(gistRes)
 
 def parseDates(year: int) -> dict:
     dates = {}
