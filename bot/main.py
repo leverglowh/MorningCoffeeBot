@@ -48,6 +48,7 @@ def updateGist(data: dict) -> None:
     # print(req.text)
 
 def onAddEmoji(date: str) -> None:
+    pass
     # gistRes = readGist()
     # countedDict = gistRes['usageCount']
     # todaysCount = countedDict.get(date, 0)
