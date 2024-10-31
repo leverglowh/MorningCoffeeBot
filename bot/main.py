@@ -117,6 +117,10 @@ async def on_message(message):
         updateGist(gistRes)
         return
 
+    if message.content.lower().startswith('-heroku'):
+        await message.channel.send("F heroku!")
+        return
+
     if (' ' not in newMessage and 'mornin' in newMessage.lower()) or any(keyword in newMessage.lower() for keyword in partial_keywords):
         await message.add_reaction(r"☕")
         onAddEmoji(todayJustDate)
