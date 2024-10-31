@@ -1,11 +1,14 @@
 FROM python:3.9-slim
-
 WORKDIR /app
 
-COPY ./requirements.txt .
+# Add a non-root user
+RUN adduser --disabled-password --gecos "" mcb
 
-RUN pip install -r ./requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY bot ./bot
+
+USER mcb
 
 CMD ["python", "bot/main.py"]
