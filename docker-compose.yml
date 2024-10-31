@@ -1,0 +1,7 @@
+services:
+  mcb:
+    container_name: mcb
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: ".env"
