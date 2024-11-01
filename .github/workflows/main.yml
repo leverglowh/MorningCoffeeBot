@@ -51,10 +51,23 @@ jobs:
             # Login to ghcr.io
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            docker compose down || true
-            
             # Create/update .env file
+            mkdir -p /root/mcb
+            cd /root/mcb
             echo "${{ secrets.ENV_FILE }}" > .env
-
-            docker compose up -d
+            
+            docker stop mcb || true
+            docker rm mcb || true
+            
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            docker run -d \
+              --name mcb \
+              --restart unless-stopped \
+              --env-file .env \
+              --log-driver json-file \
+              --log-opt max-size=10m \
+              --log-opt max-file=3 \
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            docker ps | grep mcb
