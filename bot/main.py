@@ -20,43 +20,48 @@ envData = get_env_data_as_dict('.env')
 
 #---------------------
 
+base_url = os.getenv('API_BASE_URL') or envData.get('API_BASE_URL')
+api_url = base_url + '/api/mcb/data'
+
 def readGist() -> any:
-    gist_id = os.getenv('GH_GIST_ID') or envData.get('GH_GIST_ID')
-    url = 'https://api.github.com/gists/' + gist_id
-    # print(url)
-    req = requests.get(url, json=None, headers=None)
-    response = json.loads(req.json().get('files').get('mcb.json').get('content'))
+    # gist_id = os.getenv('GH_GIST_ID') or envData.get('GH_GIST_ID')
+    # url = 'https://api.github.com/gists/' + gist_id
+    # # print(url)
+    req = requests.get(api_url, json=None, headers=None)
+    # response = json.loads(req.json().get('files').get('mcb.json').get('content'))
+    response = req.json()
     return response
 
 def updateGist(data: dict) -> None:
-    gist_id = os.getenv('GH_GIST_ID') or envData.get('GH_GIST_ID')
-    gh_access_token = os.getenv('GH_ACCESS_TOKEN') or envData.get('GH_ACCESS_TOKEN')
-    url = 'https://api.github.com/gists/' + gist_id
+    # gist_id = os.getenv('GH_GIST_ID') or envData.get('GH_GIST_ID')
+    # gh_access_token = os.getenv('GH_ACCESS_TOKEN') or envData.get('GH_ACCESS_TOKEN')
+    # url = 'https://api.github.com/gists/' + gist_id
+    # headers = {
+    #     'Authorization': 'Bearer ' + gh_access_token
+    # }
+    # body = {
+    #     "files": {
+    #         "mcb.json": {
+    #             "content": json.dumps(data)
+    #         }
+    #     }
+    # }
+    api_key = os.getenv('API_KEY') or envData.get('API_KEY')
     headers = {
-        'Authorization': 'Bearer ' + gh_access_token
+        'X-API-Key': api_key
     }
-    body = {
-        "files": {
-            "mcb.json": {
-                "content": json.dumps(data)
-            }
-        }
-    }
-    req = requests.patch(url, json=body, headers=headers)
-    
-
-    # print(req.text)
+    req = requests.put(api_url, json=data, headers=headers)
 
 def onAddEmoji(date: str) -> None:
     pass
-    # gistRes = readGist()
-    # countedDict = gistRes['usageCount']
-    # todaysCount = countedDict.get(date, 0)
-    # todaysCount+=1
-    # countedDict[date] = todaysCount
-    # # print(todaysCount)
-    # gistRes['usageCount'] = countedDict
-    # updateGist(gistRes)
+    gistRes = readGist()
+    countedDict = gistRes['usageCount']
+    todaysCount = countedDict.get(date, 0)
+    todaysCount+=1
+    countedDict[date] = todaysCount
+    # print(todaysCount)
+    gistRes['usageCount'] = countedDict
+    updateGist(gistRes)
 
 def parseDates(year: int) -> dict:
     dates = {}
