@@ -52,16 +52,20 @@ def updateGist(data: dict) -> None:
     }
     req = requests.put(api_url, json=data, headers=headers)
 
+def incrementCounter(date: str) -> None:
+    requests.post(base_url + '/api/mcb/inc/' + date)
+
 def onAddEmoji(date: str) -> None:
     pass
-    gistRes = readGist()
-    countedDict = gistRes['usageCount']
-    todaysCount = countedDict.get(date, 0)
-    todaysCount+=1
-    countedDict[date] = todaysCount
+    incrementCounter(date)
+    # gistRes = readGist()
+    # countedDict = gistRes['usageCount']
+    # todaysCount = countedDict.get(date, 0)
+    # todaysCount+=1
+    # countedDict[date] = todaysCount
     # print(todaysCount)
-    gistRes['usageCount'] = countedDict
-    updateGist(gistRes)
+    # gistRes['usageCount'] = countedDict
+    # updateGist(gistRes)
 
 def parseDates(year: int) -> dict:
     dates = {}
@@ -120,6 +124,11 @@ async def on_message(message):
         gistRes['serverCount'] = str(len(client.guilds))
 
         updateGist(gistRes)
+        return
+
+    if message.content.lower().startswith('-mcbstatus'):
+        gistRes = readGist()
+        await message.channel.send("Today is " + todayJustDate + " and I reacted " + str(gistRes['usageCount'][todayJustDate]) + " times!")
         return
 
     if message.content.lower().startswith('-heroku'):
