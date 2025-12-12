@@ -112,6 +112,20 @@ async def on_message(message):
     parsedDates = parseDates(today.year)
     if message.author == client.user:
         return
+    
+    if message.guild is None and not message.author.bot:
+        # Is DM
+        target_channel_id = 1449013521005416459
+        support_user_id = 524302018005827598
+        target_channel = client.get_channel(target_channel_id)
+        if target_channel:
+            # Send the DM content to the channel
+            await target_channel.send(f"DM from {message.author.display_name}: {message.content}")
+            await message.channel.send("Message redirected!")
+        else:
+            await message.channel.send(f"Could not redirect message to <@{support_user_id}>, please contact them directly.")
+        return
+
     # Ignore all emojis
     newMessage = deEmojify(message.content).translate(str.maketrans('', '', string.punctuation)).strip()
 
