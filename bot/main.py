@@ -53,7 +53,10 @@ def updateGist(data: dict) -> None:
     req = requests.put(api_url, json=data, headers=headers)
 
 def incrementCounter(date: str) -> None:
-    requests.post(base_url + '/api/mcb/inc/' + date)
+    api_key = os.getenv('API_KEY') or envData.get('API_KEY')
+    requests.post(base_url + '/api/mcb/inc/' + date, headers={
+        'X-API-Key': api_key
+    })
 
 def onAddEmoji(date: str) -> None:
     pass
